@@ -3,9 +3,9 @@ pipeline {
 
     environment {
         DOCKER_TAG = "20250127"
-        IMAGE_NAME = "manojkrishnappa/fullstack"
-        AWS_REGION = "us-east-1"
-        CLUSTER_NAME = "microdegree-cluster"
+        IMAGE_NAME = "poojadasdev/fullstack"
+        AWS_REGION = "ap-south-1"
+        CLUSTER_NAME = "project-cluster"
     }
 
     tools {
@@ -16,7 +16,7 @@ pipeline {
     stages {
         stage('Git Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/ManojKRISHNAPPA/complete-cicd-project-microdegree.git'
+                git branch: 'main', url: 'https://github.com/ThePoojaDas/complete-cicd-project.git'
             }
         }
 
@@ -43,7 +43,7 @@ pipeline {
         stage('Docker Image Scan') {
             steps {
                 script {
-                    sh "trivy image --format table -o trivy-image-report.html manojkrishnappa/fullstack:20250127"
+                    sh "trivy image --format table -o trivy-image-report.html poojadasdev/fullstack:20250127"
                 }
             }
         }
@@ -76,18 +76,18 @@ pipeline {
         
         stage('Deploy To Kubernetes') {
             steps {
-                withKubeConfig(caCertificate: '', clusterName: 'microdegree-cluster', contextName: '', credentialsId: 'kube', namespace: 'microdegree', restrictKubeConfigAccess: false, serverUrl: 'https://051F562F901B4989F303EFD7E097F687.gr7.us-east-1.eks.amazonaws.com') {
-                    sh "kubectl get pods -n microdegree"
-                    sh "kubectl apply -f deployment.yml -n microdegree"
+                withKubeConfig(caCertificate: '', clusterName: 'project-cluster', contextName: '', credentialsId: 'kube', namespace: 'project', restrictKubeConfigAccess: false, serverUrl: 'https://051F562F901B4989F303EFD7E097F687.gr7.us-east-1.eks.amazonaws.com') {
+                    sh "kubectl get pods -n project"
+                    sh "kubectl apply -f deployment.yml -n project"
                 }
             }
         }
 
         stage('Verify the Deployment') {
             steps {
-                withKubeConfig(caCertificate: '', clusterName: 'microdegree-cluster', contextName: '', credentialsId: 'kube', namespace: 'microdegree', restrictKubeConfigAccess: false, serverUrl: 'https://051F562F901B4989F303EFD7E097F687.gr7.us-east-1.eks.amazonaws.com') {
-                    sh "kubectl get pods -n microdegree"
-                    sh "kubectl get svc -n microdegree"
+                withKubeConfig(caCertificate: '', clusterName: 'project-cluster', contextName: '', credentialsId: 'kube', namespace: 'project', restrictKubeConfigAccess: false, serverUrl: 'https://051F562F901B4989F303EFD7E097F687.gr7.us-east-1.eks.amazonaws.com') {
+                    sh "kubectl get pods -n project"
+                    sh "kubectl get svc -n project"
                 }
             }
         }
@@ -118,9 +118,9 @@ pipeline {
                 emailext (
                     subject: "${jobName} - Build ${buildNumber} - ${pipelineStatus.toUpperCase()}",
                     body: body,
-                    to: 'aa5218321@gmail.com',
-                    from: 'manojdevopstest@gmail.com',
-                    replyTo: 'manojdevopstest@gmail.com',
+                    to: 'poojadas50750@gmail.com',
+                    from: 'poojadas50750@gmail.com',
+                    replyTo: 'poojadas50750@gmail.com',
                     mimeType: 'text/html',
                     attachmentsPattern: 'trivy-image-report.html'
                 )
